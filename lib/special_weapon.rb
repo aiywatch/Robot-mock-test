@@ -1,5 +1,5 @@
 require_relative 'Weapon'
-require_relative 'Robot'
+require_relative 'robot'
 
 class SpecialWeapon < Weapon
   NAME = 'SpecialWeapon'

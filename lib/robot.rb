@@ -97,8 +97,9 @@ class Robot
   end
 
   def attackable?(robot)
+    range = equipped_weapon.nil? ? 1 : equipped_weapon.range
     (self.position[0] - robot.position[0]).abs + 
-    (self.position[1] - robot.position[1]).abs <= equipped_weapon.range
+    (self.position[1] - robot.position[1]).abs <= range
   end
 
   def next_to?(robot)

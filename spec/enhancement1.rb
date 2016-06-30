@@ -12,7 +12,7 @@ describe Robot do
     end
 
     it "should be able to heal normally if the robot is not dead" do
-      @robot.wound(50)
+      @robot.direct_damage(50)
       @robot.heal!(20)
       expect(@robot.health).to eql(70)
     end
