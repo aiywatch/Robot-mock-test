@@ -32,6 +32,7 @@ class Robot
   end
 
   def pick_up(item)
+    item.feed(self) if healable?(item)
     if items_weight + item.weight <= CAPACITY
       @equipped_weapon = item if item.is_a?(Weapon)
       @items << item 
@@ -59,16 +60,29 @@ class Robot
   end
 
   def attack(robot)
-    robot.wound(DEFAULT_DMG)
-    equipped_weapon.hit(robot) unless equipped_weapon.nil?
+    if attackable?(robot)
+      robot.wound(DEFAULT_DMG)
+      equipped_weapon.hit(robot) unless equipped_weapon.nil? or equipped_weapon.is_a?(Grenade)
+      @equipped_weapon = nil if equipped_weapon.is_a?(Grenade)
+    end
   end
 
   def attack!(robot)
     raise UnattackableEnemy, "Can attack only Robot type" unless robot.is_a?(Robot)
-    robot.wound(DEFAULT_DMG)
-    equipped_weapon.hit(robot) unless equipped_weapon.nil?
+    if attackable?(robot)
+      robot.wound(DEFAULT_DMG)
+      equipped_weapon.hit(robot) unless equipped_weapon.nil?
+    end
   end
 
+  def attackable?(robot)
+    (self.position[0] - robot.position[0]).abs + 
+    (self.position[1] - robot.position[1]).abs <= equipped_weapon.range
+  end
+
+  def healable?(item)
+    item.is_a?(BoxOfBolts) && health <= 80
+  end
 end
 
 
