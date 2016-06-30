@@ -1,4 +1,5 @@
 # require_relative 'weapon'
+require_relative 'error'
 
 class Robot
   CAPACITY = 250
@@ -51,7 +52,19 @@ class Robot
     @health = MAX_HEALTH if @health > MAX_HEALTH
   end
 
+  def heal!(hp)
+    raise RobotAlreadyDeadError, "Can not heal if the robot is already dead" if health <= 0
+    @health += hp
+    @health = MAX_HEALTH if @health > MAX_HEALTH
+  end
+
   def attack(robot)
+    robot.wound(DEFAULT_DMG)
+    equipped_weapon.hit(robot) unless equipped_weapon.nil?
+  end
+
+  def attack!(robot)
+    raise UnattackableEnemy, "Can attack only Robot type" unless robot.is_a?(Robot)
     robot.wound(DEFAULT_DMG)
     equipped_weapon.hit(robot) unless equipped_weapon.nil?
   end
