@@ -5,14 +5,26 @@ class Robot
   CAPACITY = 250
   MAX_HEALTH = 100
   DEFAULT_DMG = 5
+  SHIELD = 50
+  @@robots = []
 
-  attr_reader :position, :items, :health
+  attr_reader :position, :items, :health, :shield
   attr_accessor :equipped_weapon
 
   def initialize
     @position = [0,0]
     @items = []
     @health = MAX_HEALTH
+    @shield = 50
+    @@robots << self
+  end
+
+  def self.robots
+    @@robots
+  end
+
+  def self.in_position(x, y)
+    @@robots.select{ |robot| robot.position == [x, y] }
   end
 
   def move_left
@@ -44,6 +56,15 @@ class Robot
   end
 
   def wound(dmg)
+    if dmg > shield
+      @health -= (dmg - shield)
+    else
+      @shield -= dmg
+    end
+    @health = 0 if health < 0
+  end
+
+  def direct_damage(dmg)
     @health -= dmg
     @health = 0 if health < 0
   end
@@ -80,8 +101,21 @@ class Robot
     (self.position[1] - robot.position[1]).abs <= equipped_weapon.range
   end
 
+  def next_to?(robot)
+    (self.position[0] - robot.position[0]).abs + 
+    (self.position[1] - robot.position[1]).abs <= 1
+  end
+
   def healable?(item)
     item.is_a?(BoxOfBolts) && health <= 80
+  end
+
+  def recharged
+    @shield = SHIELD
+  end
+
+  def scanning
+    @@robots.select { |robot| next_to?(robot) && robot != self }
   end
 end
 
